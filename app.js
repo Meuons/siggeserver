@@ -4,7 +4,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const { createCanvas, loadImage } = require("canvas");
-const { writeFileSync, } = require("fs");
+const { writeFileSync } = require("fs");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
@@ -12,10 +12,7 @@ const cv = require("opencv-sigge");
 
 var app = express();
 
-
-
 const wait = async () => {
-
   console.log("start");
   /*await loadOpenCV();*/
 
