@@ -9,6 +9,7 @@
     "adaptive-threshold": "^1.2.0",
     "canvas": "^2.11.0",
     "cookie-parser": "~1.4.4",
+    "crypto": "^1.0.1",
     "debug": "~2.6.9",
     "express": "~4.16.1",
     "get-pixels": "^3.3.3",
@@ -17,14 +18,16 @@
     "jpeg-js": "^0.4.4",
     "jsdom": "^21.1.1",
     "morgan": "~1.9.1",
+    "mysql": "^2.18.1",
     "node": "^19.8.1",
     "opencv-sigge": "^1.1.0",
-    "prettier": "^2.8.7",
     "pug": "2.0.0-beta11",
     "robotjs": "^0.6.0",
     "save-pixels": "^2.3.6"
   },
   "devDependencies": {
-    "electron-rebuild": "^3.2.9"
+    "electron-rebuild": "^3.2.9",
+    "prettier": "^2.8.7",
+    "sqlite3": "^5.1.6"
   }
 }

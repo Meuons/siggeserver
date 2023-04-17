@@ -11,25 +11,28 @@ var usersRouter = require("./routes/users");
 const cv = require("opencv-sigge");
 
 var app = express();
+/*The image manipulation is commented away until
+we find a way to send images to the server
+ */
 
-const wait = async () => {
+/*const wait = async () => {
   console.log("start");
-  /*await loadOpenCV();*/
+  await loadOpenCV();
 
-  const image = await loadImage("kvitto.jpg");
+  const image = await loadImage("kvitto.png");
 
   const src = cv.imread(image);
   let gray = new cv.Mat();
   cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
   let thresh = new cv.Mat();
-  cv.threshold(gray, thresh, 107, 980, cv.THRESH_BINARY);
+  cv.threshold(gray, thresh, 157, 900, cv.THRESH_BINARY);
   const canvas = createCanvas(200, 200);
   cv.imshow(canvas, thresh);
   writeFileSync("output.jpg", canvas.toBuffer("image/jpeg"));
   src.delete();
   gray.delete();
 };
-wait();
+wait();*/
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
