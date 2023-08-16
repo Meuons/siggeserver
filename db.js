@@ -37,8 +37,25 @@ exports.run = (query, callback) => {
   /*The error callback is always returned even when things go right
 If the err callback is null there is no error (duh!). Maybe a bit of a tacky solution
 but hey as long as it works*/
-  db.run(query, (err) => {
-    callback(err);
+  db.run(query, (err, row) => {
+    console.log('error: ' + err)
+    console.log('row: ' + row)
+    callback(err, row);
+  });
+};
+exports.get = (query, callback) => {
+  db.all(query, (err, rows) => {
+    if (err) {
+      console.log(JSON.stringify(err));
+      callback(err);
+      return;
+    }
+    if (rows.length === 0) {
+      console.log(JSON.stringify(rows));
+      callback(null, 0);
+    } else {
+      callback(rows);
+    }
   });
 };
 

@@ -7,32 +7,33 @@ const { createCanvas, loadImage } = require("canvas");
 const { writeFileSync } = require("fs");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var cors = require('cors')
+var receiptsRouter = require("./routes/receipts");
+var categoriesRouter = require("./routes/categories");
+var reportsRouter = require("./routes/reports");
+var imagesRouter = require("./routes/images");
+var accountsRouter = require("./routes/accounts");
+var wageTypeRouter = require("./routes/wage-types");
+var cors = require("cors");
 const cv = require("opencv-sigge");
+const fs = require('fs');
 
 var app = express();
-/*The image manipulation is commented away until
-we find a way to send images to the server
- */
 
-/*const wait = async () => {
-  console.log("start");
-  await loadOpenCV();
+const Tesseract = require('tesseract.js')
 
-  const image = await loadImage("kvitto.png");
 
-  const src = cv.imread(image);
-  let gray = new cv.Mat();
-  cv.cvtColor(src, gray, cv.COLOR_BGR2GRAY, 0);
-  let thresh = new cv.Mat();
-  cv.threshold(gray, thresh, 157, 900, cv.THRESH_BINARY);
-  const canvas = createCanvas(200, 200);
-  cv.imshow(canvas, thresh);
-  writeFileSync("output.jpg", canvas.toBuffer("image/jpeg"));
-  src.delete();
-  gray.delete();
-};
-wait();*/
+const extractDataFromReceipt = () => {
+    const imageFile = './kvitto.jpg';
+    const imageBuffer = fs.readFileSync(imageFile);
+
+    Tesseract.recognize(imageFile)
+
+        .then(result => {
+            console.log(result.text);
+        });
+}
+
+
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
@@ -45,6 +46,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/receipts", receiptsRouter);
+app.use("/reports", reportsRouter);
+app.use("/images", imagesRouter);
+app.use("/categories", categoriesRouter);
+app.use("/accounts", accountsRouter);
+app.use("/wage-types", wageTypeRouter);
 
 app.use(function (req, res, next) {
   next(createError(404));

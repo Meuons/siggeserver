@@ -1,0 +1,19 @@
+-- database: c:\Users\MånsMårlid\projekt\SiggeM\SM-17\siggem-server\siggeDB.db
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+-- She's got a ticket to ri-ide, she's got a ticket to ri-i-ide!
+
+CREATE TABLE categories
+              (
+                category_id INTEGER PRIMARY KEY,
+				title TEXT NOT NULL,
+                description TEXT NOT NULL,
+				icon TEXT NOT NULL, 
+				account INT NOT NULL,
+                wage_type INT NOT NULL,
+                deductible BIT DEFAULT 0,
+                admin_only BIT DEFAULT 0, "tax" INTEGER NOT NULL,
+                 FOREIGN KEY (account) REFERENCES account(account_id)
+                 FOREIGN KEY (wage_type) REFERENCES wage_types(type_id)
+              )

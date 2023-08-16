@@ -13,8 +13,10 @@ router.post("/login", function (req, res, next) {
       body.username +
       "'",
     (row) => {
+
       /*Check if the username exists in the db*/
       if (row) {
+          console.log('found')
         /*Check if the username and password match*/
         if (row.username === body.username && row.password === body.password) {
           /*Add a token in the users row and return the token to the client*/
@@ -27,7 +29,7 @@ router.post("/login", function (req, res, next) {
             /*Error handling using the callback*/
             (err) => {
               if (err) {
-                res.send(JSON.stringify({ message: `login error:${err}` }));
+                res.send(JSON.stringify({ error: `login error:${err}` }));
               } else {
                 res.send(
                   JSON.stringify({ message: "login success", token: token })
@@ -36,10 +38,10 @@ router.post("/login", function (req, res, next) {
             }
           );
         } else {
-          res.send(JSON.stringify({ message: "invalid credentials" }));
+          res.send(JSON.stringify({ error: "invalid credentials" }));
         }
       } else {
-        res.send(JSON.stringify({ message: "user not found" }));
+        res.send(JSON.stringify({ error: "user not found" }));
       }
     }
   );
@@ -62,14 +64,14 @@ router.post("/logout", function (req, res, next) {
           "'",
         (err) => {
           if (err) {
-            res.send(JSON.stringify({ message: `logout error: ${err}` }));
+            res.send(JSON.stringify({ error: `logout error: ${err}` }));
           } else {
             res.send(JSON.stringify({ message: "logout success" }));
           }
         }
       );
     } else {
-      res.send(JSON.stringify({ message: "unauthorized" }));
+      res.send(JSON.stringify({ error: "unauthorized" }));
     }
   });
 });
@@ -85,21 +87,23 @@ router.post("/create", function (req, res, next) {
           "'",
         (row) => {
           if (row) {
-            res.send(JSON.stringify({ message: "username already taken" }));
+            res.send(JSON.stringify({ error: "username already taken" }));
           } else {
             db.run(
-              "INSERT INTO users (username, password)VALUES ('" +
+              "INSERT INTO users (username, password, admin)VALUES ('" +
                 body.newUsername +
                 "','" +
                 body.newPassword +
+                "','" +
+                body.newAdmin +
                 "')",
               (err) => {
                 if (err) {
                   res.send(
-                    JSON.stringify({ message: `"user creation error: ${err}` })
+                    JSON.stringify({ error: `"user creation error: ${err}` })
                   );
                 } else {
-                  res.send(JSON.stringify({ message: "user created" }));
+                  res.send("user created" );
                 }
               }
             );
@@ -107,33 +111,92 @@ router.post("/create", function (req, res, next) {
         }
       );
     } else {
-      res.send(JSON.stringify({ message: "unauthorized" }));
+      res.send(JSON.stringify({ error: "unauthorized" }));
     }
   });
 });
 
 /*The rest is pretty straightforward*/
-
-router.post("/delete", function (req, res, next) {
+router.post("/read", function (req, res, next) {
   const body = req.body;
   auth.authorize(body.token, body.username, true, (authorized) => {
     if (authorized) {
-      db.run(
-        "DELETE FROM users WHERE username = '" + body.updateUser + "'",
-        (err) => {
-          if (err) {
-            res.send(JSON.stringify({ message: `delete error: ${err}` }));
+      db.get(
+        "SELECT * FROM users",
+
+        (row) => {
+          if (row) {
+            res.send(JSON.stringify({ message: "Read success", users: row }));
           } else {
-            res.send(JSON.stringify({ message: "delete success" }));
+            res.send(JSON.stringify({ error: "No data found" }));
           }
         }
       );
     } else {
-      res.send(JSON.stringify({ message: "unauthorized" }));
+      res.send(JSON.stringify({error: "unauthorized" }));
     }
   });
 });
 
+router.post("/read-single", function (req, res, next) {
+  const body = req.body;
+  auth.authorize(body.token, body.username, true, (authorized) => {
+    if (authorized) {
+      db.get(
+        "SELECT * FROM users WHERE username = '" + body.readUsername + "'",
+
+        (row) => {
+          if (row) {
+            res.send(JSON.stringify({ message: "Read success", user: row[0] }));
+          } else {
+            res.send(JSON.stringify({ error: "No data found" }));
+          }
+        }
+      );
+    } else {
+      res.send(JSON.stringify({ error: "unauthorized" }));
+    }
+  });
+});
+router.post("/delete", function (req, res, next) {
+    const body = req.body;
+    auth.authorize(body.token, body.username, true, (authorized) => {
+        if (authorized) {
+
+          db.get("SELECT EXISTS ( SELECT 1 FROM expenditure_reports WHERE user = '" + body.updateUsername + "') AS id_used_in_fk",
+          (row) => {
+              if (row) {
+                  if(row[0].id_used_in_fk == 0){
+                    db.get("SELECT logged_in FROM users WHERE username = '" + body.updateUsername + "'",
+                    (row) => {
+                          
+                      if(row[0].logged_in == 0){
+                        db.run(
+                          "DELETE FROM users WHERE username = '" + body.updateUsername + "'",
+                          (err) => {
+                              if (err) {
+                                  res.send(JSON.stringify({ error: `delete error: ${err}` }));
+                              } else {
+                                  res.send(JSON.stringify({ message: "delete success" }));
+                              }
+                          }
+                      );
+                      }
+                      else{
+                        res.send(JSON.stringify({ error: "Cannot delete logged in users" }));
+                      }
+                    }
+                    )
+             } 
+                  else{
+                    res.send(JSON.stringify({ error: "Cannot delete record used in constraint" }));
+                  } }})
+            
+        } else {
+            res.send(JSON.stringify({ error: "unauthorized" }));
+        }
+    });
+});
 router.post("/update", function (req, res, next) {
   const body = req.body;
   auth.authorize(body.token, body.username, true, (authorized) => {
@@ -141,20 +204,23 @@ router.post("/update", function (req, res, next) {
       db.run(
         "UPDATE users SET password = '" +
           body.newPassword +
-          "' WHERE username = '" +
-          body.updateUser +
+          "', admin = " + body.newAdmin +
+          " WHERE username = '" +
+          body.updateUsername +
           "'",
         (err) => {
           if (err) {
-            res.send(JSON.stringify({ message: `update error: ${err}` }));
+            res.send(JSON.stringify({ error: `update error: ${err}` }));
           } else {
             res.send(JSON.stringify({ message: "update success" }));
           }
         }
       );
     } else {
-      res.send(JSON.stringify({ message: "unauthorized" }));
+      res.send(JSON.stringify({ error: "unauthorized" }));
     }
   });
+
 });
+
 module.exports = router;
