@@ -11,7 +11,7 @@ exports.downloadImage = async (uri, callback) => {
       const response = await axios.get(uri, { responseType: 'arraybuffer' });
 
       const type = uri.substring("data:image/".length, uri.indexOf(";base64"))
-      console.log(uri)
+
       let randomName = (Math.random() + 1).toString(36).substring(2);
       await fs.writeFileSync('./images/' + randomName +'.' + type, response.data);
       const imagePath = './images/' + randomName +'.'  + type;
@@ -22,7 +22,7 @@ exports.downloadImage = async (uri, callback) => {
         type: 'stream',
     });
     callback(uploadResponse.data);
-    console.log(uploadResponse.data)
+
  
 
       
