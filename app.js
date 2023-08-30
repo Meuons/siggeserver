@@ -13,6 +13,9 @@ var reportsRouter = require("./routes/reports");
 var imagesRouter = require("./routes/images");
 var accountsRouter = require("./routes/accounts");
 var wageTypeRouter = require("./routes/wage-types");
+var chargeTypeRouter = require("./routes/charge-types");
+var retailersRouter = require("./routes/retailers");
+var currenciesRouter = require("./routes/currencies");
 var cors = require("cors");
 const cv = require("opencv-sigge");
 const fs = require('fs');
@@ -50,8 +53,11 @@ app.use("/receipts", receiptsRouter);
 app.use("/reports", reportsRouter);
 app.use("/images", imagesRouter);
 app.use("/categories", categoriesRouter);
+app.use("/currencies", currenciesRouter);
 app.use("/accounts", accountsRouter);
 app.use("/wage-types", wageTypeRouter);
+app.use("/retailers", retailersRouter);
+app.use("/charge-types", chargeTypeRouter);
 
 app.use(function (req, res, next) {
   next(createError(404));

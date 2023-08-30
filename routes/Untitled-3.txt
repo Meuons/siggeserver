@@ -1,5 +1,0 @@
--- database: c:\Users\MånsMårlid\projekt\SiggeM\SM-17\siggem-server\siggeDB.db
-
--- Use the ▷ button in the top right corner to run the entire file.
-
-

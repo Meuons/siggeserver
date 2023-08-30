@@ -163,7 +163,7 @@ router.post("/delete", function (req, res, next) {
     auth.authorize(body.token, body.username, true, (authorized) => {
         if (authorized) {
 
-          db.get("SELECT EXISTS ( SELECT 1 FROM expenditure_reports WHERE user = '" + body.updateUsername + "') AS id_used_in_fk",
+          db.get("SELECT EXISTS ( SELECT 1 FROM reports WHERE user = '" + body.updateUsername + "') AS id_used_in_fk",
           (row) => {
               if (row) {
                   if(row[0].id_used_in_fk == 0){

@@ -10,11 +10,10 @@ exports.downloadImage = async (uri, callback) => {
     try {
       const response = await axios.get(uri, { responseType: 'arraybuffer' });
 
-      const type = uri.substring("data:image/".length, uri.indexOf(";base64"))
 
       let randomName = (Math.random() + 1).toString(36).substring(2);
-      await fs.writeFileSync('./images/' + randomName +'.' + type, response.data);
-      const imagePath = './images/' + randomName +'.'  + type;
+      await fs.writeFileSync('./images/' + randomName +'.jpeg', response.data);
+      const imagePath = './images/' + randomName +'.jpeg'
 
 
     const uploadResponse = await client.upload({

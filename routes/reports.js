@@ -9,7 +9,7 @@ router.post("/create", function (req, res, next) {
     auth.authorize(body.token, body.username, false, (authorized) => {
         /*Check if the username is taken*/
 
-             db.run("INSERT INTO expenditure_reports (report_date, net, tax, total, user, title) VALUES ('" +
+             db.run("INSERT INTO reports (date, net, tax, total, currency, user, title) VALUES ('" +
                  body.date +
                  "','" +
                  body.net +
@@ -17,6 +17,8 @@ router.post("/create", function (req, res, next) {
                  body.tax +
                  "','" +
                  body.total +
+                 "','" +
+                 body.currency +
                  "','" +
                  body.user +
                  "','" +
@@ -54,7 +56,7 @@ router.post("/read", function (req, res, next) {
     auth.authorize(body.token, body.username, true, (authorized) => {
         if (authorized) {
             db.get(
-                "SELECT * FROM expenditure_reports",
+                "SELECT * FROM reports",
                 (row) => {
                     if (row) {
                         res.send(JSON.stringify({ message: "Read success", reports: row }));
@@ -74,7 +76,7 @@ router.post("/read-user", function (req, res, next) {
     auth.authorize(body.token, body.username, true, (authorized) => {
         if (authorized) {
             db.get(
-                "SELECT * FROM expenditure_reports WHERE user = '" + body.user + "'",
+                "SELECT * FROM reports WHERE user = '" + body.user + "'",
                 (row) => {
                     if (row) {
                         res.send(JSON.stringify({ message: "Read success", reports: row }));
@@ -94,7 +96,7 @@ router.post("/read-single", function (req, res, next) {
         if (authorized) {
            
             db.get(
-                "SELECT * FROM expenditure_reports WHERE report_id = " + body.report_id + "",
+                "SELECT * FROM reports WHERE report_id = " + body.report_id + "",
                 (row) => {
                     if (row) {
                         row[0].category = {category_id: row[0].category}
@@ -117,7 +119,7 @@ router.post("/delete", function (req, res, next) {
         if (authorized) {
             
             db.run(
-                "DELETE FROM expenditure_reports WHERE report_id = '" + body.report_id + "'",
+                "DELETE FROM reports WHERE report_id = '" + body.report_id + "'",
                 () => {
                     db.run(
                         " DELETE FROM receipts WHERE report =  '" + body.report_id + "'",
@@ -146,11 +148,12 @@ router.post("/update", function (req, res, next) {
         if (authorized) {
      
             db.run(
-                "UPDATE expenditure_reports SET report_date =" +
+                "UPDATE reports SET date =" +
                 "'" + body.date +
                 "',net = " + body.net +
                 ",tax = " + body.tax +
                 ", total = " + body.total +
+                ", currency = " + body.currency +
                 ", title =  '" + body.title +
                 "' WHERE report_id = " +
                 body.report_id +

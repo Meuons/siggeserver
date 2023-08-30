@@ -9,8 +9,8 @@ router.post("/create", function (req, res, next) {
     auth.authorize(body.token, body.username, false, (authorized) => {
         /*Check if the username is taken*/
    
-             db.run("INSERT INTO receipts (purchase_date, retailer, category, net, tax, total, receipt_link, product_link, account, VISA, description, report)VALUES ('" +
-             body.purchase_date +
+             db.run("INSERT INTO receipts (date, retailer, category, net, tax, total, charge_companies, receipt_link, product_link, account, VISA, description, report)VALUES ('" +
+             body.date +
                  "','" +
                  body.retailer +
                  "','" +
@@ -22,6 +22,8 @@ router.post("/create", function (req, res, next) {
                  "','" +
                  body.total +
                  "','" +
+                body.charge_companies +
+                 "','" + 
                  body.receipt_link +
                  "','" + 
                  `${ body.product_link == undefined ? ``: body.product_link }` +
@@ -152,14 +154,16 @@ router.post("/update", function (req, res, next) {
         if (authorized) {
  
             db.run(
-                "UPDATE receipts SET purchase_date =" +
-            "'" + body.purchase_date +
+                "UPDATE receipts SET date =" +
+            "'" + body.date +
             "', retailer = '" + body.retailer +
             "',category = '" + body.category +
             "',description= '" + body.description +
             "',net = " + body.net +
             ", tax = " + body.tax +
             ", total = " + body.total +
+            ", charge_companies = " +
+                body.charge_companies +
             ", receipt_link = '" + body.receipt_link +
             "', product_link = '" + body.product_link + "'" +
             ", account = '" + body.account +
